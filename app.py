@@ -2,10 +2,9 @@ from csv import excel
 import utils
 
 
-def courseList(keyW):
+def courseList(keyW, kklxdm='01'):
     print('正在进行课程查询...')
-    CourseList = User.getCourseList(keyW).get('tmpList')
-    print(CourseList)
+    CourseList = User.getCourseList(keyW, kklxdm).get('tmpList')
     i = 0
     for item in CourseList:
         print('---------------------------------------------------')
@@ -20,24 +19,27 @@ if __name__ == '__main__':
     try:
         User = utils.User()
         print(1)
-    except:
+    except Exception as e:
+        print(e)
         input()
     print('''
     *********************************
     欢迎使用【HDU抢课小助手】
     功能代码如下:
     ---------------------
-    1.【xk】选课
-    2.【yxkc】已选课程查询
-    3.【tk】退课
-    4.【-1】退出系统
+    1.选主修课
+    2.选通识选修课
+    3.选体育课
+    4.已选课程查询
+    5.退课
+    
     ---------------------
     ps:【】内的值为功能代码
     *********************************''')
     code = input('\n请输入功能代码(-1 退出系统):')
     while (code != '-1'):
-        if code == 'xk':
-            print('进入选课功能')
+        if code == '1':
+            print('进入选主修课功能')
             kch_ids = []
             keyW = input("请输入要查询的课程关键字(为空则返回全部结果):")
             courseList(keyW)
@@ -60,7 +62,56 @@ if __name__ == '__main__':
                                 print(res['msg'])
             else:
                 print('未找到课程/该课程名额已满')
-        elif code == 'yxkc':
+        elif code == '2':
+            print('进入选通识选修课功能')
+            kch_ids = []
+            keyW = input("请输入要查询的课程关键字(为空则返回全部结果):")
+            courseList(keyW, '10')
+            if kch_ids != []:
+                toChooseId = int(input("请输入要选择的课程名字前的序号(-1退出选课):"))
+                if toChooseId in range(0, len(kch_ids)):
+                    ifChoose = input(
+                        "确认选择课程 "+kch_ids[toChooseId]['name']+"? (Y/n,默认Y):")
+                    if (ifChoose != 'n'):
+                        kch_id = kch_ids[toChooseId]['id']
+                        Detail = User.getCourseDetail(kch_id, '10')
+                        if Detail == '0':
+                            print('课程具体获取失败！')
+                        else:
+                            jxb_ids = Detail[0]['do_jxb_id']
+                            res = User.chooseCourse(jxb_ids, kch_id)
+                            if res['flag'] == '1':
+                                print("选课成功！")
+                            else:
+                                print(res['msg'])
+            else:
+                print('未找到课程/该课程名额已满')
+        elif code == '3':
+            print('进入选体育课功能')
+            kch_ids = []
+            keyW = input("请输入要查询的课程关键字(为空则返回全部结果):")
+            courseList(keyW, '05')
+            if kch_ids != []:
+                toChooseId = int(input("请输入要选择的课程名字前的序号(-1退出选课):"))
+                if toChooseId in range(0, len(kch_ids)):
+                    ifChoose = input(
+                        "确认选择课程 "+kch_ids[toChooseId]['name']+"? (Y/n,默认Y):")
+                    if (ifChoose != 'n'):
+                        kch_id = kch_ids[toChooseId]['id']
+                        Detail = User.getCourseDetail(kch_id, '05')
+                        print(Detail)
+                        if Detail == '0':
+                            print('课程具体获取失败！')
+                        else:
+                            jxb_ids = Detail[0]['do_jxb_id']
+                            res = User.chooseCourse(jxb_ids, kch_id)
+                            if res['flag'] == '1':
+                                print("选课成功！")
+                            else:
+                                print(res['msg'])
+            else:
+                print('未找到课程/该课程名额已满')
+        elif code == '4':
             print('正在进行已选课程查询...')
             choosedList = User.getChoosedList()
             i = 1
@@ -69,7 +120,7 @@ if __name__ == '__main__':
                 print(str(i)+":"+item["jxbmc"])
                 i = i+1
             print('---------------------------------------------------')
-        elif code == 'tk':
+        elif code == '5':
             kch_ids = []
             print('正在进行已选课程查询...')
             choosedList = User.getChoosedList()

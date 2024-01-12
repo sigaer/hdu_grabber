@@ -11,10 +11,12 @@ passWord = cf.get('accountConfig', "passWord")
 base_url = cf.get('baseConfig', "baseUrl")
 isEnglishCourse = cf.get('baseConfig', "isEnglishCourse")
 print(base_url)
-# lgn = login.Login(base_url=base_url)
-# lgn.login(userName, passWord)  # 登陆
+lgn = login.Login(base_url=base_url)
+lgn.login(userName, passWord)  # 登陆
 
-cookie_str = "JSESSIONID=DF94DD907C7C98085709F0321AB5C100; route=a7740d479b99ac200742596ec5b9ce98"  # 字符串形式的的cookies
+# Debug
+# cookie_str = "JSESSIONID=2E3AD6D56602A67283D5BA141A94D115; route=a7740d479b99ac200742596ec5b9ce98"  # 字符串形式的的cookies
+cookie_str = lgn.cookies_str  # 字符串形式的的cookies
 # print(cookie_str)
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36',
            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
@@ -52,34 +54,90 @@ class User(object):
             "baseConfig", "xkkz_id") != 'null' else getHtmlconfig(soup, 'firstXkkzId')
         self.xsbj = cf.get("baseConfig", "xsbj") if cf.get(
             "baseConfig", "xsbj") != 'null' else getHtmlconfig(soup, 'xsbj')
+        self.xqh_id = getHtmlconfig(soup, 'xqh_id')
+        self.jg_id = getHtmlconfig(soup, 'jg_id_1')
+        self.zyfx_id = getHtmlconfig(soup, 'zyfx_id')
+        self.bh_id = getHtmlconfig(soup, 'bh_id')
+        self.xbm = cf.get("baseConfig", "xbm") if cf.get(
+            "baseConfig", "xbm") != 'null' else getHtmlconfig(soup, 'xbm')
+        self.xslbdm = getHtmlconfig(soup, 'xslbdm')
+        self.mzm = getHtmlconfig(soup, 'mzm')
+        self.xz = getHtmlconfig(soup, 'xz')
+        self.ccdm = getHtmlconfig(soup, 'ccdm')
         self.header = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:58.0) Gecko/20100101 Firefox/58.0',
             'Cookie': Ck
         }
 
-    def getCourseList(self, keyW):
+    def getCourseList(self, keyW, kklxdm):
         url = base_url+'/jwglxt/xsxk/zzxkyzb_cxZzxkYzbPartDisplay.html'
-        if isEnglishCourse == 'false':
-            data = {'xkxnm': self.xkxnm, 'xkxqm': self.xkxqm,
-                    'kklxdm': self.kklxdm, 'kspage': 1, 'jspage': 20, 'yl_list[0]': 1}
+        if kklxdm != '05':
+            if isEnglishCourse == 'false':
+                data = {'xkxnm': self.xkxnm, 'xkxqm': self.xkxqm,
+                        'kklxdm': kklxdm, 'kspage': 1, 'jspage': 20, 'yl_list[0]': 1}
+            else:
+                data = {'xkxnm': self.xkxnm, 'xkxqm': self.xkxqm, 'kklxdm': kklxdm, 'kspage': 1, 'jspage': 20, 'yl_list[0]': 1,
+                        'xsbj': self.xsbj, 'xqh_id': '0', 'jg_id': '0', 'zyfx_id': 'wfx', 'bh_id': '0', 'xbm': '0', 'xslbdm': '0', 'ccdm': '0'}
         else:
-            data = {'xkxnm': self.xkxnm, 'xkxqm': self.xkxqm, 'kklxdm': self.kklxdm, 'kspage': 1, 'jspage': 20, 'yl_list[0]': 1,
-                    'xsbj': self.xsbj, 'xqh_id': '0', 'jg_id': '0', 'zyfx_id': 'wfx', 'bh_id': '0', 'xbm': '0', 'xslbdm': '0', 'ccdm': '0'}
+            data = {'rwlx': '2',
+                    'xkly': '0',
+                    'xqh_id': self.xqh_id,
+                    'jg_id': self.jg_id,
+                    'njdm_id': self.njdm_id,
+                    'zyh_id': self.zyh_id,
+                    'zyfx_id': self.zyfx_id,
+                    'bh_id': self.userName,
+                    'xbm': self.xbm,
+                    'xslbdm': self.xslbdm,
+                    'mzm': self.mzm,
+                    'xz': self.xz,
+                    'ccdm': self.ccdm,
+                    'xkxnm': self.xkxnm,
+                    'xkxqm': self.xkxqm,
+                    'kklxdm': kklxdm,
+                    'kspage': 1,
+                    'jspage': 20,
+                    'yl_list[0]': 1,
+                    'xsbj': self.xsbj,
+                    }
         if keyW != "":
             data['filter_list[0]'] = keyW
         req = requests.post(url, data, headers=self.header)
         print(req.text)
         return (req.json())
 
-    def getCourseDetail(self, kch):
+    def getCourseDetail(self, kch, kklxdm):
         url = base_url+'/jwglxt/xsxk/zzxkyzbjk_cxJxbWithKchZzxkYzb.html'
-        if isEnglishCourse == 'false':
-            data = {'bklx_id': 0, 'njdm_id': self.njdm_id, 'xkxnm': self.xkxnm,
-                    'xkxqm': self.xkxqm, 'kklxdm': self.kklxdm, 'kch_id': kch, 'xkkz_id': self.xkkz_id, 'rwlx': '1', 'xkly': '1', 'bh_id': self.userName}
+        if kklxdm != '05':
+            if isEnglishCourse == 'false':
+                data = {'bklx_id': 0, 'njdm_id': self.njdm_id, 'xkxnm': self.xkxnm,
+                        'xkxqm': self.xkxqm, 'kklxdm': kklxdm, 'kch_id': kch, 'xkkz_id': self.xkkz_id, 'rwlx': '1', 'xkly': '1', 'bh_id': self.userName}
+            else:
+                data = {'bklx_id': 0, 'njdm_id': self.njdm_id, 'xkxnm': self.xkxnm, 'xkxqm': self.xkxqm, 'kklxdm': self.kklxdm, 'kch_id': kch, 'xkkz_id': self.xkkz_id,
+                        'xsbj': self.xsbj, 'xqh_id': '0', 'jg_id': '0', 'zyfx_id': 'wfx', 'bh_id': '0', 'xbm': '0', 'xslbdm': '0', 'ccdm': '0', 'rwlx': '1', 'xkly': '1', 'bh_id': self.userName}
         else:
-            data = {'bklx_id': 0, 'njdm_id': self.njdm_id, 'xkxnm': self.xkxnm, 'xkxqm': self.xkxqm, 'kklxdm': self.kklxdm, 'kch_id': kch, 'xkkz_id': self.xkkz_id,
-                    'xsbj': self.xsbj, 'xqh_id': '0', 'jg_id': '0', 'zyfx_id': 'wfx', 'bh_id': '0', 'xbm': '0', 'xslbdm': '0', 'ccdm': '0', 'rwlx': '1', 'xkly': '1', 'bh_id': self.userName}
+            data = {'rwlx': '2',
+                    'xkly': '0',
+                    'bklx_id': '0',
+                    'xqh_id': self.xqh_id,
+                    'jg_id': self.jg_id,
+                    'zyh_id': self.zyh_id,
+                    'zyfx_id': self.zyfx_id,
+                    'njdm_id': self.njdm_id,
+                    'bh_id': self.userName,
+                    'xbm': self.xbm,
+                    'xslbdm': self.xslbdm,
+                    'mzm': self.mzm,
+                    'xz': self.xz,
+                    'ccdm': self.ccdm,
+                    'xsbj': self.xsbj,
+                    'xkxnm': self.xkxnm,
+                    'xkxqm': self.xkxqm,
+                    'kklxdm': kklxdm,
+                    'kch_id': kch,
+                    'xkkz_id': self.xkkz_id
+                    }
         req = requests.post(url, data, headers=self.header)
         return (req.json())
 
