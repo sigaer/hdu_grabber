@@ -9,7 +9,7 @@ def courseList(keyW):
     i = 0
     for item in CourseList:
         print('---------------------------------------------------')
-        print(str(i)+":"+item["jxbmc"])
+        print(str(i)+":"+item["jxbmc"]+"-"+item["kcmc"])
         print('   '+item["kzmc"]+'\t'+item['xf']+'学分'+'\t'+item['yxzrs']+'人已选')
         kch_ids.append({'id': item["kch_id"], 'name': item["jxbmc"]})
         i = i+1
@@ -87,13 +87,14 @@ if __name__ == '__main__':
                         "确认退选课程 "+kch_ids[toQuitId]['name']+"? (yes/N,默认N):")
                     if (ifChoose == 'yes'):
                         kch_id = kch_ids[toQuitId]['id']
+                        print(kch_id)
                         Detail = User.getCourseDetail(kch_id)
                         if Detail == '0':
                             print('课程具体获取失败！')
                         else:
                             jxb_ids = Detail[0]['do_jxb_id']
                             res = User.quitCourse(jxb_ids)
-                            if res == '1':
+                            if res == 'success':
                                 print('退课成功')
                             else:
                                 print(res)

@@ -11,10 +11,10 @@ passWord = cf.get('accountConfig', "passWord")
 base_url = cf.get('baseConfig', "baseUrl")
 isEnglishCourse = cf.get('baseConfig', "isEnglishCourse")
 print(base_url)
-lgn = login.Login(base_url=base_url)
-lgn.login(userName, passWord)  # 登陆
+# lgn = login.Login(base_url=base_url)
+# lgn.login(userName, passWord)  # 登陆
 
-cookie_str = lgn.cookies_str  # 字符串形式的的cookies
+cookie_str = "JSESSIONID=DF94DD907C7C98085709F0321AB5C100; route=a7740d479b99ac200742596ec5b9ce98"  # 字符串形式的的cookies
 # print(cookie_str)
 headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36',
            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
@@ -37,6 +37,7 @@ def getHtmlconfig(soup, parameterName):
 class User(object):
     def __init__(self):
         Ck = cookie_str
+        self.userName = cf.get("accountConfig", "userName")
         self.kklxdm = cf.get("baseConfig", "kklxdm") if cf.get(
             "baseConfig", "kklxdm") != 'null' else getHtmlconfig(soup, 'firstKklxdm')
         self.xkxnm = cf.get("baseConfig", "xkxnm") if cf.get(
@@ -75,10 +76,10 @@ class User(object):
         url = base_url+'/jwglxt/xsxk/zzxkyzbjk_cxJxbWithKchZzxkYzb.html'
         if isEnglishCourse == 'false':
             data = {'bklx_id': 0, 'njdm_id': self.njdm_id, 'xkxnm': self.xkxnm,
-                    'xkxqm': self.xkxqm, 'kklxdm': self.kklxdm, 'kch_id': kch, 'xkkz_id': self.xkkz_id}
+                    'xkxqm': self.xkxqm, 'kklxdm': self.kklxdm, 'kch_id': kch, 'xkkz_id': self.xkkz_id, 'rwlx': '1', 'xkly': '1', 'bh_id': self.userName}
         else:
             data = {'bklx_id': 0, 'njdm_id': self.njdm_id, 'xkxnm': self.xkxnm, 'xkxqm': self.xkxqm, 'kklxdm': self.kklxdm, 'kch_id': kch, 'xkkz_id': self.xkkz_id,
-                    'xsbj': self.xsbj, 'xqh_id': '0', 'jg_id': '0', 'zyfx_id': 'wfx', 'bh_id': '0', 'xbm': '0', 'xslbdm': '0', 'ccdm': '0'}
+                    'xsbj': self.xsbj, 'xqh_id': '0', 'jg_id': '0', 'zyfx_id': 'wfx', 'bh_id': '0', 'xbm': '0', 'xslbdm': '0', 'ccdm': '0', 'rwlx': '1', 'xkly': '1', 'bh_id': self.userName}
         req = requests.post(url, data, headers=self.header)
         return (req.json())
 
@@ -96,7 +97,14 @@ class User(object):
         return (req.json())
 
     def quitCourse(self, jxb_ids):
-        url = base_url+'/jwglxt/xsxk/zzxkyzb_tuikBcZzxkYzb.html'
+        url = base_url+'/jwglxt/xsxk/zzxkyzb_tuikBcZzxkYzb.html?gnmkdm=N253512'
         data = {'jxb_ids': jxb_ids}
         req = requests.post(url, data, headers=self.header)
+        print(req.json())
+        if req.json() == '1':
+            url = base_url+'/jwglxt/xsxk/zzxkyzb_xkBcZypxZzxkYzb.html?gnmkdm=N253512'
+            data = {'zypxs': "", "jxb_ids": ""}
+            req = requests.post(url, data, headers=self.header)
+            print(req.text)
+            return req.json()
         return (req.json())
