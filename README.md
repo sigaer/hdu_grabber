@@ -1,22 +1,32 @@
 # 杭州电子科技大学抢课小助手
 
-本脚本暂时处于测试版阶段，还未经过实测，待更新。
+本脚本暂时处于测试版阶段，很多功能尚未实现，待更新。
 
 🎈 代码修改，以及请求参数配置具体详见:<a href='https://github.com/shaxiu/ZF_API'>正方教务选课系统 API 分析文档</a>
 
 ---
 
+#### 实现功能
+
+- 选主修课
+- 选通识课
+- 选体育课
+- 查询已选课程
+- 退课(目前仅主修课)
+
 #### 安装库
 
-`pip3 install configparser`
+`pip install configparser`
 
-`pip3 install requests`
+`pip install requests`
 
-`pip3 install rsa`
+`pip install rsa`
 
-`pip3 install bs4`
+`pip install bs4`
 
-`pip3 install pycryptodome`
+`pip install pycryptodome`
+
+`pip install lxml`
 
 ## 脚本配置
 
@@ -27,9 +37,12 @@ passWord=密码
 [baseConfig]
 baseUrl = https://newjw.hdu.edu.cn
 xkkz_id = null
+ts_xkkz_id = null
+ty_xkkz_id = null
 kklxdm=null
 xkxnm=null
 xkxqm=null
+xbm=null
 njdm_id=null
 zyh_id=null
 isEnglishCourse=false
@@ -40,7 +53,7 @@ isEnglishCourse=false
 - 将 `config.ini` 与软件脚本放于同一目录下
 - 将配置文件中的 `userName` `passWord` 改为自己的用户名和密码
 - 将 `baseUrl` 改为学校教学管理平台对应域名地址
-- 若是拓展英语课程，将 `isEnglishCourse` 参数改为 `true`（未经测试，俺也不知道管不管用）
+- 若是拓展英语课程，将 `isEnglishCourse` 参数改为 `true`（未经测试）
 - 其他参数无需更改
 
 **进阶玩法**
@@ -48,7 +61,6 @@ isEnglishCourse=false
 - 若学校进行分年级分时段选 选修课，例如 19 级可以进行选课而作为 20 级的你无法选课/只可以选主修课
 - 你可以通过修改参数~~欺骗后台~~ ，~~假装自己是 19 级的~~
 - 修改 `njdm_id` 如 `2020` -> ` 2019`
-- 修改 `kklxdm` ：`01`为主修课 `10` 为选修课 `07`为拓展英语课 ps:每个学校不同，仅供参考
 - 修改 `xkkz_id`：该参数可以找对应有权限选课的高年级/低年级同学要，每一轮次选课固定
 - 其他参数配置具体详见:<a href='https://github.com/shaxiu/ZF_API'>正方教务选课系统 API 分析文档</a>
 
